@@ -1,8 +1,10 @@
+const fs= require('fs');
 const net =require('net');
-var httpServer= net.createServer(function(socket){
-socket.on('data', function(data){
-console.log(data.toString());
-var response = "Welcome to HTTP Server version 1.0";
+
+function sendResponse(socket, file)
+{
+var data= fs.readFileSync(file,'utf-8');
+var response =data;
 var responseLength= response.length;
 var a = "HTTP/1.1 200 OK\n";
 a=a+"Content-Type: text/html\n"; 
@@ -10,6 +12,21 @@ a=a+`Content-Length: ${responseLength}\n`;
 a=a+"\n";
 a=a+response;
 socket.write(a);
+}
+
+var httpServer= net.createServer(function(socket){
+socket.on('data', function(data){
+var request =data.toString();
+var splits= request.split("\n");
+var firstLine = splits[0];
+var words = firstLine.split(" ");;
+var requestPath = words[1];
+console.log("Path : "+ requestPath);
+if(path=="/")
+{
+sendResponse("index.html");
+}
+else sendResponse(path.substring(1));
 }); //onData ends
 
 socket.on('end', function(){
